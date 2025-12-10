@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { ArrowDown, Github, Linkedin, Mail } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { ArrowDown, Github, Linkedin, Mail, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import gsap from 'gsap';
 
 const roles = [
   'Full-Stack Developer',
@@ -13,7 +14,87 @@ export const HeroSection = () => {
   const [currentRole, setCurrentRole] = useState(0);
   const [displayText, setDisplayText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  const heroRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const particlesRef = useRef<HTMLDivElement>(null);
 
+  // GSAP Animations
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Animate grid lines
+      gsap.fromTo('.grid-line-h', 
+        { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 0.1, duration: 1.5, stagger: 0.1, ease: 'power2.out' }
+      );
+      gsap.fromTo('.grid-line-v', 
+        { scaleY: 0, opacity: 0 },
+        { scaleY: 1, opacity: 0.1, duration: 1.5, stagger: 0.1, ease: 'power2.out' }
+      );
+
+      // Hero content animation
+      gsap.fromTo('.hero-greeting',
+        { opacity: 0, y: 30, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.8, delay: 0.3, ease: 'back.out(1.7)' }
+      );
+
+      gsap.fromTo('.hero-name',
+        { opacity: 0, y: 50, clipPath: 'inset(100% 0 0 0)' },
+        { opacity: 1, y: 0, clipPath: 'inset(0% 0 0 0)', duration: 1, delay: 0.5, ease: 'power4.out' }
+      );
+
+      gsap.fromTo('.hero-role',
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, delay: 0.8, ease: 'power2.out' }
+      );
+
+      gsap.fromTo('.hero-description',
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, delay: 1, ease: 'power2.out' }
+      );
+
+      gsap.fromTo('.hero-social',
+        { opacity: 0, scale: 0, rotation: -180 },
+        { opacity: 1, scale: 1, rotation: 0, duration: 0.6, delay: 1.2, stagger: 0.1, ease: 'back.out(1.7)' }
+      );
+
+      gsap.fromTo('.hero-cta',
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, delay: 1.5, stagger: 0.15, ease: 'power2.out' }
+      );
+
+      // Floating particles animation
+      gsap.to('.particle', {
+        y: 'random(-20, 20)',
+        x: 'random(-20, 20)',
+        duration: 'random(2, 4)',
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        stagger: {
+          amount: 2,
+          from: 'random'
+        }
+      });
+
+      // Glowing orbs
+      gsap.to('.glow-orb', {
+        scale: 'random(0.8, 1.2)',
+        opacity: 'random(0.3, 0.6)',
+        duration: 'random(3, 5)',
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        stagger: 0.5
+      });
+
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Typewriter effect
   useEffect(() => {
     const role = roles[currentRole];
     const timeout = setTimeout(() => {
@@ -41,48 +122,97 @@ export const HeroSection = () => {
   };
 
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(173_80%_50%_/_0.1)_0%,_transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(250_60%_60%_/_0.1)_0%,_transparent_50%)]" />
-      <div className="absolute top-1/4 -right-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 -left-32 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '-3s' }} />
+    <section ref={heroRef} id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Tech Grid Background */}
+      <div ref={gridRef} className="absolute inset-0 overflow-hidden">
+        {/* Horizontal grid lines */}
+        {[...Array(10)].map((_, i) => (
+          <div 
+            key={`h-${i}`}
+            className="grid-line-h absolute w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"
+            style={{ top: `${(i + 1) * 10}%` }}
+          />
+        ))}
+        {/* Vertical grid lines */}
+        {[...Array(10)].map((_, i) => (
+          <div 
+            key={`v-${i}`}
+            className="grid-line-v absolute h-full w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent"
+            style={{ left: `${(i + 1) * 10}%` }}
+          />
+        ))}
+      </div>
+
+      {/* Animated Particles */}
+      <div ref={particlesRef} className="absolute inset-0 pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="particle absolute w-1 h-1 rounded-full bg-primary/60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Glowing Orbs */}
+      <div className="glow-orb absolute top-1/4 -right-32 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
+      <div className="glow-orb absolute bottom-1/4 -left-32 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
+      <div className="glow-orb absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl" />
+
+      {/* Scan Line Effect */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,_hsl(var(--primary)_/_0.02)_50%)] bg-[length:100%_4px] animate-scan" />
+      </div>
       
       <div className="section-container relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Greeting */}
-          <p className="text-primary font-mono text-sm md:text-base mb-4 animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
-            {'<Hello World />'}
-          </p>
+          {/* Terminal Greeting */}
+          <div className="hero-greeting inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm mb-6">
+            <Terminal className="h-4 w-4 text-primary" />
+            <span className="text-primary font-mono text-sm md:text-base">
+              {'~/portfolio > hello_world'}
+            </span>
+            <span className="w-2 h-4 bg-primary animate-pulse" />
+          </div>
 
-          {/* Name */}
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 animate-slide-up opacity-0" style={{ animationDelay: '0.2s' }}>
-            I'm <span className="gradient-text">Abhishek Kumar</span>
+          {/* Name with Glitch Effect */}
+          <h1 ref={titleRef} className="hero-name text-4xl sm:text-5xl md:text-7xl font-bold mb-4">
+            I'm <span className="gradient-text relative">
+              Abhishek Kumar
+              <span className="absolute inset-0 gradient-text opacity-50 animate-glitch-1">Abhishek Kumar</span>
+              <span className="absolute inset-0 gradient-text opacity-50 animate-glitch-2">Abhishek Kumar</span>
+            </span>
             <br />
-            <span className="text-3xl sm:text-4xl md:text-5xl">Pandey</span>
+            <span className="text-3xl sm:text-4xl md:text-5xl text-muted-foreground">Pandey</span>
           </h1>
 
-          {/* Dynamic Role */}
-          <div className="h-12 md:h-16 flex items-center justify-center mb-6 animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
-            <span className="text-xl md:text-3xl font-semibold text-muted-foreground">
-              {displayText}
-              <span className="animate-pulse text-primary">|</span>
-            </span>
+          {/* Dynamic Role with Code Style */}
+          <div className="hero-role h-12 md:h-16 flex items-center justify-center mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card/50 border border-border/50 backdrop-blur-sm">
+              <span className="text-primary font-mono text-sm">const role =</span>
+              <span className="text-xl md:text-2xl font-semibold text-foreground font-mono">
+                "{displayText}"
+              </span>
+              <span className="w-0.5 h-6 bg-primary animate-pulse" />
+            </div>
           </div>
 
           {/* Description */}
-          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-8 animate-slide-up opacity-0" style={{ animationDelay: '0.4s' }}>
+          <p className="hero-description text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-8">
             I build fast, scalable web applications with modern technologies. 
             Passionate about crafting seamless user experiences and solving complex problems.
           </p>
 
           {/* Social Links */}
-          <div className="flex items-center justify-center gap-4 mb-10 animate-slide-up opacity-0" style={{ animationDelay: '0.5s' }}>
+          <div className="flex items-center justify-center gap-4 mb-10">
             <a 
               href="https://github.com/pandey-jee" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 glass-card-hover rounded-full hover:text-primary transition-colors"
+              className="hero-social p-3 glass-card-hover rounded-full hover:text-primary hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)_/_0.3)]"
             >
               <Github className="h-5 w-5" />
             </a>
@@ -90,41 +220,49 @@ export const HeroSection = () => {
               href="https://linkedin.com/in/abhishek-kumar-pandey" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 glass-card-hover rounded-full hover:text-primary transition-colors"
+              className="hero-social p-3 glass-card-hover rounded-full hover:text-primary hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)_/_0.3)]"
             >
               <Linkedin className="h-5 w-5" />
             </a>
             <a 
               href="mailto:pandeyji252002@gmail.com"
-              className="p-3 glass-card-hover rounded-full hover:text-primary transition-colors"
+              className="hero-social p-3 glass-card-hover rounded-full hover:text-primary hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)_/_0.3)]"
             >
               <Mail className="h-5 w-5" />
             </a>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up opacity-0" style={{ animationDelay: '0.6s' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
               size="lg" 
-              className="glow-button w-full sm:w-auto px-8"
+              className="hero-cta glow-button w-full sm:w-auto px-8 relative overflow-hidden group"
               onClick={scrollToProjects}
             >
-              View My Work
+              <span className="relative z-10">View My Work</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity" />
             </Button>
             <Button 
               variant="outline" 
               size="lg"
-              className="w-full sm:w-auto px-8 border-primary/50 hover:bg-primary/10"
+              className="hero-cta w-full sm:w-auto px-8 border-primary/50 hover:bg-primary/10 hover:border-primary hover:shadow-[0_0_30px_hsl(var(--primary)_/_0.2)] transition-all duration-300"
               onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
             >
+              <span className="font-mono">&lt;</span>
               Get In Touch
+              <span className="font-mono">/&gt;</span>
             </Button>
           </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ArrowDown className="h-6 w-6 text-muted-foreground" />
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+            <span className="text-xs font-mono uppercase tracking-widest">Scroll</span>
+            <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex justify-center pt-2">
+              <div className="w-1 h-2 bg-primary rounded-full animate-bounce" />
+            </div>
+          </div>
         </div>
       </div>
     </section>
