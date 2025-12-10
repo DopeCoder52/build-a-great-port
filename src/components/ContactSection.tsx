@@ -1,0 +1,198 @@
+import { useState } from 'react';
+import { Mail, Phone, MapPin, Send, Github, Linkedin, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+
+const contactInfo = [
+  {
+    icon: Mail,
+    label: 'Email',
+    value: 'pandeyji252002@gmail.com',
+    href: 'mailto:pandeyji252002@gmail.com',
+  },
+  {
+    icon: Phone,
+    label: 'Phone',
+    value: '+91 90316 98085',
+    href: 'tel:+919031698085',
+  },
+  {
+    icon: MapPin,
+    label: 'Location',
+    value: 'India',
+    href: null,
+  },
+];
+
+const socialLinks = [
+  {
+    icon: Github,
+    label: 'GitHub',
+    href: 'https://github.com/pandey-jee',
+  },
+  {
+    icon: Linkedin,
+    label: 'LinkedIn',
+    href: 'https://linkedin.com/in/abhishek-kumar-pandey',
+  },
+];
+
+export const ContactSection = () => {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate form submission
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast({
+      title: "Message sent!",
+      description: "Thanks for reaching out. I'll get back to you soon!",
+    });
+    
+    setFormData({ name: '', email: '', message: '' });
+    setIsSubmitting(false);
+  };
+
+  return (
+    <section id="contact" className="py-24 relative">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_hsl(173_80%_50%_/_0.05)_0%,_transparent_70%)]" />
+      
+      <div className="section-container relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <p className="text-primary font-mono text-sm mb-2">{'<Contact />'}</p>
+          <h2 className="text-3xl md:text-5xl font-bold mb-4">
+            Let's <span className="gradient-text">Connect</span>
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Have a project in mind or just want to chat? Feel free to reach out. 
+            I'm always open to discussing new opportunities.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Contact Info */}
+          <div className="space-y-6">
+            {contactInfo.map((item) => (
+              <div 
+                key={item.label}
+                className="glass-card-hover p-6 flex items-center gap-4"
+              >
+                <div className="p-3 rounded-xl bg-primary/10">
+                  <item.icon className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">{item.label}</p>
+                  {item.href ? (
+                    <a 
+                      href={item.href}
+                      className="font-medium hover:text-primary transition-colors"
+                    >
+                      {item.value}
+                    </a>
+                  ) : (
+                    <p className="font-medium">{item.value}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Social Links */}
+            <div className="glass-card p-6">
+              <h4 className="font-semibold mb-4">Find me on</h4>
+              <div className="flex gap-4">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    <social.icon className="h-5 w-5" />
+                    <span className="text-sm">{social.label}</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="glass-card p-8">
+            <h3 className="text-xl font-semibold mb-6">Send a Message</h3>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium mb-2">
+                  Name
+                </label>
+                <Input
+                  id="name"
+                  placeholder="Your name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="bg-muted/50 border-border/50 focus:border-primary"
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium mb-2">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  className="bg-muted/50 border-border/50 focus:border-primary"
+                />
+              </div>
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium mb-2">
+                  Message
+                </label>
+                <Textarea
+                  id="message"
+                  placeholder="Tell me about your project..."
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  required
+                  className="bg-muted/50 border-border/50 focus:border-primary resize-none"
+                />
+              </div>
+              <Button 
+                type="submit" 
+                size="lg" 
+                className="w-full glow-button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  'Sending...'
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send Message
+                  </>
+                )}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
